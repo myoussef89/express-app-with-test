@@ -9,18 +9,17 @@ pipeline {
         }
         
         stage('Build image') {
-            steps {
-                script {
-                    def app
-                    app = docker.build("memo600/greentube")
-                }   
-            }   
+          steps {
+              script {
+                  docker.build("memo600/greentube")
+              }   
+          }   
         }
         
       stage('Test image') {
         steps {
             script {
-                app.inside {
+                docker.image("memo600/greentube").inside {
 
                 //sh 'npm install'
                 sh 'npm test'
@@ -46,8 +45,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
-                    app.push("${env.BUILD_NUMBER}")
-                    app.push("latest")
+                    docker.image("memo600/greentube").push("${env.BUILD_NUMBER}")
+                    docker.image("memo600/greentube").push("latest")
                     }
                 }
             }   
