@@ -42,6 +42,9 @@ pipeline {
        }
        
         stage('Push image') {
+          when {
+             branch 'master'
+          }  
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
