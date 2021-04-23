@@ -13,7 +13,16 @@ node {
              //sh 'npm install'
 	     sh 'npm test'
             }    
-        }     
+        } 
+       stage ('publish report') {
+	  publishHTML (target: [
+	  allowMissing: false,
+          alwaysLinkToLastBuild: false,
+     	  keepAll: true,
+     	  reportDir: 'coverage',
+     	  reportFiles: 'index.html',
+     	  reportName: "Express Report"
+       ])    
        stage('Push image') {
 		docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
 		   app.push("${env.BUILD_NUMBER}")            
