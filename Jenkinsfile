@@ -42,6 +42,9 @@ pipeline {
            }
            
             stage('Push image') {
+                when {
+                  branch 'master'
+                }           
                 steps {
                     script {
                         docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
@@ -52,14 +55,14 @@ pipeline {
                 }   
             }
         }
-		
+        
       post {
         success {
 
           emailext (
               subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
               body: """SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'
-                Check console output at '${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]""",
+                Check console output at '${env.BUILD_URL}'""",
               recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             )
         }
@@ -69,7 +72,7 @@ pipeline {
           emailext (
               subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
               body: """FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'
-                Check console output at '${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]""",
+                Check console output at '${env.BUILD_URL}'""",
               recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             )
         }
