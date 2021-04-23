@@ -1,59 +1,78 @@
 pipeline {
-    agent any
-    stages {
-    
-        stage('Clone repository') {
-            steps {
-                checkout scm
-            }   
-        }
+        agent any
+        stages {
         
-        stage('Build image') {
-          steps {
-              script {
-                  docker.build("memo600/greentube")
+            stage('Clone repository') {
+                steps {
+                    checkout scm
+                }   
+            }
+            
+            stage('Build image') {
+              steps {
+                  script {
+                      docker.build("memo600/greentube")
+                  }   
               }   
-          }   
-        }
-        
-      stage('Test image') {
-        steps {
-            script {
-                docker.image("memo600/greentube").inside {
-
-                //sh 'npm install'
-                sh 'npm test'
-                }
-            } 
-        }       
-      }
-      
-      stage ('publish report') {
-        steps {
-          publishHTML (target: [
-            allowMissing: false,
-            alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: 'coverage/lcov-report',
-            reportFiles: 'index.html',
-            reportName: "Express Report"
-          ])
-        } 
-       }
-       
-        stage('Push image') {
-          when {
-             branch 'master'
-          }  
+            }
+            
+          stage('Test image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
-                    docker.image("memo600/greentube").push("${env.BUILD_NUMBER}")
-                    docker.image("memo600/greentube").push("latest")
+                    docker.image("memo600/greentube").inside {
+
+                    //sh 'npm install'
+                    sh 'npm test'
                     }
-                }
-            }   
+                } 
+            }       
+          }
+          
+          stage ('publish report') {
+            steps {
+              publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'coverage/lcov-report',
+                reportFiles: 'index.html',
+                reportName: "Express Report"
+              ])
+            } 
+           }
+           
+            stage('Push image') {
+                steps {
+                    script {
+                        docker.withRegistry('https://registry.hub.docker.com', 'joe-docker-hub') {
+                        docker.image("memo600/greentube").push("${env.BUILD_NUMBER}")
+                        docker.image("memo600/greentube").push("latest")
+                        }
+                    }
+                }   
+            }
         }
-    }      
+		
+      post {
+        success {
+
+          emailext (
+              subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+              body: """<p>SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+                <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+              recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
+
+        failure {
+
+          emailext (
+              subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+              body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+                <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+              recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
+      } 
 }
 
