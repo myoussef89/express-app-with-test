@@ -1,9 +1,8 @@
 node {    
       def app     
       stage('Clone repository') {               
-             
-		git([url: 'git@github.com:myoussef89/express-app-with-test.git', branch: 'develop', credentialsId: 'myoussef89'])
-
+	    checkout scm
+	    #git([url: 'git@github.com:myoussef89/express-app-with-test.git', branch: 'develop', credentialsId: 'myoussef89'])
       }     
       stage('Build image') {         
        
