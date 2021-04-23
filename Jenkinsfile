@@ -5,7 +5,7 @@ node {
       }     
       stage('Build image') {         
        
-            app = docker.build("greentube/test")
+            app = docker.build("memo600/greentube")
        }     
       stage('Test image') {
             app.inside {          
