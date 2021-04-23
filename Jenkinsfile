@@ -8,7 +8,7 @@ node {
             app = docker.build("greentube/test")
        }     
       stage('Test image') {
-            app.withRun {            
+            app.image.inside {          
              
              sh 'npm test'        
             }    
