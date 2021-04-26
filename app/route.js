@@ -37,6 +37,14 @@ function route(app) {
         return res.status(500).send({ error });
       });
   });
+	
+  app.get('/health-check',(req,res)=> {
+    res.send ("Health check passed");
+  });
+
+  app.get('/bad-health',(req,res)=> {
+    res.status(500).send('Health check did not pass');
+  });
 }
 
 module.exports = route;
