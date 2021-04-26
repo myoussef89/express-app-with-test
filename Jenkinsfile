@@ -21,7 +21,7 @@ pipeline {
                 script {
                     docker.image("memo600/greentube").inside {
 
-                    //sh 'npm install'
+                    sh 'npm install'
                     sh 'npm test'
                     sh 'npm run test:e2e'
                     }
