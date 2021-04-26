@@ -3,9 +3,7 @@ services:
   web:
     build:
       context: ./
-      target: dev
     volumes:
-      - .:/src
       - myapp:/myapp
     command: npm run start
     ports:

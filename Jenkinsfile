@@ -11,7 +11,7 @@ pipeline {
             stage('Build image') {
               steps {
                   script {
-                      docker.build("memo600/greentube","--target dev -f Dockerfile .")
+                      docker.build("memo600/greentube")
                   }   
               }   
             }
