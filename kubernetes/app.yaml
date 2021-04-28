@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-app
+spec:
+  selector:
+    matchLabels:
+      app: express-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: express-app
+        tier: frontend
+    spec:   
+      containers:
+      - name: express-app
+        image: memo600/greentube:latest
+        envFrom:
+          - configMapRef:
+              name: express-config
+        command: ["npm"]
+        args: ["run", "start"]
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health-check
+            port: 3000
+          initialDelaySeconds: 8
+          periodSeconds: 3
+          failureThreshold: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 25%
